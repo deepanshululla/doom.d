@@ -21,8 +21,8 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
-(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
-      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+(setq doom-font (font-spec :family "Fira Code" :size 16 :weight 'semi-light)
+      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 16))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -39,21 +39,36 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
+
+;; add grammar check to emacs
+(setq langtool-java-bin "/usr/local/opt/openjdk/bin/java")
+
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(after! org
+  (setq org-directory "~/org/"
+        org-agenda-files (directory-files-recursively "~/todos" "\.org$")
+      )
+)
 
-;; (setq mac-command-modifier      'super
-;;       ns-command-modifier       'super
-;;       mac-option-modifier       'meta
-;;       ns-option-modifier        'meta
-;;       mac-right-option-modifier 'none
-;;       ns-right-option-modifier  'none)
+
+(after! org
+(setq mac-command-modifier       'super
+       ns-command-modifier       'super
+       ;;mac-option-modifier       'meta
+       ns-option-modifier        'meta
+       mac-right-option-modifier 'none
+       ns-right-option-modifier  'none))
 
 (setq kill-whole-line t)
 (setq confirm-kill-emacs nil)
 (setq auto-save-default t
-      make-backup-files t)
+       make-backup-files t)
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
+;; use c-x-c-s for saving instead of company-yasnippet
+(map! :i "C-x C-s" nil)
+(map! :map global-map "C-x C-s" #'save-buffer)
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an

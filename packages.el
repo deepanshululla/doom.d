@@ -62,3 +62,8 @@
 (package! org-brain)
 (package! ascii-art-to-unicode)
 (package! wakatime-mode)
+(package! vertico)
+(package! helm-projectile)
+(package! helm-icons)
+(package! osx-trash)
+(package! magit)
