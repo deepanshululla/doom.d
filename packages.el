@@ -67,3 +67,17 @@
 (package! helm-icons)
 (package! osx-trash)
 (package! magit)
+(package! treemacs-magit)
+(package! treemacs-persp)
+(package! lsp-treemacs)
+(package! treemacs-projectile)
+(package! string-inflection :pin "fd7926ac17293e9124b31f706a4e8f38f6a9b855")
+;; make info packages look colorful
+(package! info-colors :pin "47ee73cc19b1049eef32c9f3e264ea7ef2aaf8a5")
+;; preetify org
+(package! org-pretty-table
+  :recipe (:host github :repo "Fuco1/org-pretty-table") :pin "7bd68b420d3402826fea16ee5099d04aa9879b78")
+;; pretty line breaks
+(package! page-break-lines :recipe (:host github :repo "purcell/page-break-lines")
+  :pin "cc283621c64e4f1133a63e0945658a4abecf42ef")
+(package! org-super-agenda :pin "3108bc3f725818f0e868520d2c243abe9acbef4e")
