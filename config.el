@@ -52,6 +52,7 @@
 
 
 
+
 (custom-set-faces!
   '(doom-modeline-buffer-modified :foreground "orange"))
 
@@ -182,7 +183,6 @@
                            :todo ("SOMEDAY" )
                            :order 90)
                           (:discard (:tag ("Chore" "Routine" "Daily")))))))))))
-
 (defun my-org-summarize-task-status ()
   "Count number of tasks by status.
       Probably should make this a dblock someday."
@@ -532,56 +532,16 @@
 
 
 
-(after! treemacs
-  (defvar treemacs-file-ignore-extensions '()
-    "File extension which `treemacs-ignore-filter' will ensure are ignored")
-  (defvar treemacs-file-ignore-globs '()
-    "Globs which will are transformed to `treemacs-file-ignore-regexps' which `treemacs-ignore-filter' will ensure are ignored")
-  (defvar treemacs-file-ignore-regexps '()
-    "RegExps to be tested to ignore files, generated from `treeemacs-file-ignore-globs'")
-  (defun treemacs-file-ignore-generate-regexps ()
-    "Generate `treemacs-file-ignore-regexps' from `treemacs-file-ignore-globs'"
-    (setq treemacs-file-ignore-regexps (mapcar 'dired-glob-regexp treemacs-file-ignore-globs)))
-  (if (equal treemacs-file-ignore-globs '()) nil (treemacs-file-ignore-generate-regexps))
-  (defun treemacs-ignore-filter (file full-path)
-    "Ignore files specified by `treemacs-file-ignore-extensions', and `treemacs-file-ignore-regexps'"
-    (or (member (file-name-extension file) treemacs-file-ignore-extensions)
-        (let ((ignore-file nil))
-          (dolist (regexp treemacs-file-ignore-regexps ignore-file)
-            (setq ignore-file (or ignore-file (if (string-match-p regexp full-path) t nil)))))))
-  (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-filter))
 
 
+;;(setq doom-themes-treemacs-theme "doom-colors")
 
-(setq treemacs-file-ignore-extensions
-      '(;; LaTeX
-        "aux"
-        "ptc"
-        "fdb_latexmk"
-        "fls"
-        "synctex.gz"
-        "toc"
-        ;; LaTeX - glossary
-        "glg"
-        "glo"
-        "gls"
-        "glsdefs"
-        "ist"
-        "acn"
-        "acr"
-        "alg"
-        ;; LaTeX - pgfplots
-        "mw"
-        ;; LaTeX - pdfx
-        "pdfa.xmpi"
-        ))
-(setq treemacs-file-ignore-globs
-      '(;; LaTeX
-        "*/_minted-*"
-        ;; AucTeX
-        "*/.auctex-auto"
-        "*/_region_.log"
-        "*/_region_.tex"))
+(setq doom-themes-treemacs-theme "doom-colors")
+
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
 
 (after! text-mode
   (add-hook! 'text-mode-hook
@@ -601,6 +561,45 @@
 
 
 
+(add-transient-hook! #'org-babel-execute-src-block
+  (require 'ob-async))
+
+(defvar org-babel-auto-async-languages '()
+  "Babel languages which should be executed asyncronously by default.")
+
+(defadvice! org-babel-get-src-block-info-eager-async-a (orig-fn &optional light datum)
+  "Eagarly add an :async parameter to the src information, unless it seems problematic.
+This only acts o languages in `org-babel-auto-async-languages'.
+Not added when either:
++ session is not \"none\"
++ :sync is set"
+  :around #'org-babel-get-src-block-info
+  (let ((result (funcall orig-fn light datum)))
+    (when (and (string= "none" (cdr (assoc :session (caddr result))))
+               (member (car result) org-babel-auto-async-languages)
+               (not (assoc :async (caddr result))) ; don't duplicate
+               (not (assoc :sync (caddr result))))
+      (push '(:async) (caddr result)))
+    result))
+
+(setq ess-eval-visibly 'nowait)
+
+(setq ess-R-font-lock-keywords
+      '((ess-R-fl-keyword:keywords . t)
+        (ess-R-fl-keyword:constants . t)
+        (ess-R-fl-keyword:modifiers . t)
+        (ess-R-fl-keyword:fun-defs . t)
+        (ess-R-fl-keyword:assign-ops . t)
+        (ess-R-fl-keyword:%op% . t)
+        (ess-fl-keyword:fun-calls . t)
+        (ess-fl-keyword:numbers . t)
+        (ess-fl-keyword:operators . t)
+        (ess-fl-keyword:delimiters . t)
+        (ess-fl-keyword:= . t)
+        (ess-R-fl-keyword:F&T . t)))
+
+
+(add-to-list '+org-babel-mode-alist '(jags . ess-jags))
 ;; Ispell is nice,
 ;;https://tecosaur.github.io/emacs-config/config.html#ispell
 ;;
