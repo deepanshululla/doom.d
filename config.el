@@ -539,10 +539,6 @@
 (setq doom-themes-treemacs-theme "doom-colors")
 
 
-(use-package treemacs-icons-dired
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
-
 (after! text-mode
   (add-hook! 'text-mode-hook
              ;; Apply ANSI color codes

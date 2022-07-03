@@ -81,5 +81,4 @@
 (package! page-break-lines :recipe (:host github :repo "purcell/page-break-lines")
   :pin "cc283621c64e4f1133a63e0945658a4abecf42ef")
 (package! org-super-agenda :pin "3108bc3f725818f0e868520d2c243abe9acbef4e")
-(package! all-the-icons)
-(package! treemacs-all-the-icons)
+
