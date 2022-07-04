@@ -66,6 +66,30 @@
 
 (add-hook 'after-change-major-mode-hook #'doom-modeline-conditional-buffer-encoding)
 
+
+(defun +doom-dashboard-setup-modified-keymap ()
+  (setq +doom-dashboard-mode-map (make-sparse-keymap))
+  (map! :map +doom-dashboard-mode-map
+        :desc "Find file" :ne "f" #'find-file
+        :desc "Recent files" :ne "r" #'consult-recent-file
+        :desc "Config dir" :ne "C" #'doom/open-private-config
+        :desc "Open config.org" :ne "c" (cmd! (find-file (expand-file-name "config.org" doom-private-dir)))
+        :desc "Open dotfile" :ne "." (cmd! (doom-project-find-file "~/.config/"))
+        :desc "Notes (roam)" :ne "n" #'org-roam-node-find
+        :desc "Switch buffer" :ne "b" #'+vertico/switch-workspace-buffer
+        :desc "Switch buffers (all)" :ne "B" #'consult-buffer
+        :desc "IBuffer" :ne "i" #'ibuffer
+        :desc "Previous buffer" :ne "p" #'previous-buffer
+        :desc "Set theme" :ne "t" #'consult-theme
+        :desc "Quit" :ne "Q" #'save-buffers-kill-terminal
+        :desc "Show keybindings" :ne "h" (cmd! (which-key-show-keymap '+doom-dashboard-mode-map))))
+
+(add-transient-hook! #'+doom-dashboard-mode (+doom-dashboard-setup-modified-keymap))
+(add-transient-hook! #'+doom-dashboard-mode :append (+doom-dashboard-setup-modified-keymap))
+(add-hook! 'doom-init-ui-hook :append (+doom-dashboard-setup-modified-keymap))
+
+(map! :leader :desc "Dashboard" "d" #'+doom-dashboard/open)
+
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
@@ -401,14 +425,25 @@
 (map! :i "C-x C-s" nil)
 (map! :map global-map "C-x C-s" #'save-buffer)
 
+
+(map! "C-d"
+      (cmd! (previous-line)
+            (kill-line)
+            (forward-line)))
+
 (defadvice! prompt-for-buffer (&rest _)
   :after 'window-split (switch-to-buffer))
 
+;;By default changes made via a customisation interface are added to init.el.
+;;I prefer the idea of using a separate file for this. We just need to change a setting, and load it if it exists.
+(setq-default custom-file (expand-file-name ".custom.el" doom-private-dir))
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 
 
 (after! company
-  (setq company-idle-delay 0.5
+  (setq company-idle-delay 0.2
         company-minimum-prefix-length 2)
   (setq company-show-quick-access t)
   (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
@@ -449,7 +484,19 @@
       (setq evil-repeat-info '([?g ?~])))
     (define-key evil-normal-state-map (kbd "g~") 'evil-operator-string-inflection)))
 
-
+(after! evil
+  (setq evil-ex-substitute-global t     ; I like my s/../.. to by global by default
+        evil-move-cursor-back nil       ; Don't move the block cursor when toggling insert mode
+        evil-kill-on-visual-paste nil)) ; Don't put overwritten text in the kill ring
+;; Ispell is nice, let’s have it in text, markdown, and GFM.
+(set-company-backend!
+  '(text-mode
+    markdown-mode
+    gfm-mode)
+  '(:seperate
+    company-ispell
+    company-files
+    company-yasnippet))
 
 
 ;; make info more colorful
@@ -596,6 +643,8 @@ Not added when either:
 
 
 (add-to-list '+org-babel-mode-alist '(jags . ess-jags))
+
+
 ;; Ispell is nice,
 ;;https://tecosaur.github.io/emacs-config/config.html#ispell
 ;;
