@@ -6,8 +6,8 @@
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
-(setq user-full-name "Deepanshu lulla"
-      user-mail-address "deepanshu.lulla@gmail.com")
+;; (setq user-full-name "Deepanshu lulla"
+;;       user-mail-address "deepanshu.lulla@mailchimp.com")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -124,12 +124,27 @@
       org-agenda-skip-deadline-if-done t
       org-agenda-include-deadlines t
       org-agenda-block-separator nil
-      org-agenda-tags-column 20 ;; from testing this seems to be a good value
+      org-agenda-tags-column 30 ;; from testing this seems to be a good value
       org-agenda-compact-blocks t)
 
 (setq org-agenda-custom-commands
+             '(("W" "Weekly review"
+                agenda ""
+                ((org-agenda-start-day "-14d")
+                 (org-agenda-span 14)
+                 (org-agenda-start-on-weekday 1)
+                 (org-agenda-start-with-log-mode '(closed))
+                 (org-agenda-archives-mode t)
+                 (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
+               ("n" "Agenda and all TODOs"
+                agenda ""
+                ((alltodo "")))
+              )
+              )
+(setq org-agenda-custom-commands
       '(("o" "Overview"
-         ((agenda "" ((org-agenda-span 'day)
+         (
+          (agenda "" ((org-agenda-span 'day)
                       (org-super-agenda-groups
                        '((:name "Today"
                           :time-grid t
@@ -137,6 +152,7 @@
                           :todo "TODAY"
                           :scheduled today
                           :order 1)))))
+                          
           (alltodo "" ((org-agenda-overriding-header "")
                        (org-super-agenda-groups
                         '((:name "Next to do"
@@ -185,7 +201,49 @@
                            :tag ("Trivial" "Unimportant")
                            :todo ("SOMEDAY" )
                            :order 90)
-                          (:discard (:tag ("Chore" "Routine" "Daily")))))))))))
+                          (:discard (:tag ("Chore" "Routine" "Daily")))
+                            
+                        )
+                      ))
+            ))
+          )
+          ("W" "Weekly review"
+                agenda ""
+                ((org-agenda-start-day "-14d")
+                 (org-agenda-span 14)
+                 (org-agenda-start-on-weekday 1)
+                 (org-agenda-start-with-log-mode '(closed))
+                 (org-agenda-archives-mode t)
+                 (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
+               ("n" "Agenda and all TODOs"
+                agenda ""
+                ((alltodo "")))
+          ("Q" "Monthly review"
+                agenda ""
+                ((org-agenda-start-day "-30d")
+                 (org-agenda-span 30)
+                 (org-agenda-start-on-weekday 1)
+                 (org-agenda-start-with-log-mode '(closed))
+                 (org-agenda-archives-mode t)
+                 (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))))
+               ("n" "Agenda and all TODOs"
+                agenda ""
+                ((alltodo "")))
+          ("d" "Daily review"
+                agenda ""
+                (
+                (org-agenda-start-day "-0d")
+                 (org-agenda-span 1)
+                 (org-agenda-overriding-header "Today's Tasks")
+                ;;  (org-agenda-start-with-log-mode '(closed))
+                ;;  (org-agenda-archives-mode t)
+                ;;  (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp "^\\*\\* DONE "))
+                 
+                 ))
+               ("n" "Agenda and all TODOs"
+                agenda ""
+                ((alltodo "")))
+          ))
 (defun my-org-summarize-task-status ()
   "Count number of tasks by status.
       Probably should make this a dblock someday."
