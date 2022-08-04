@@ -499,7 +499,7 @@
         :desc "Next page break" :nv "]" #'forward-page))
 
 ;; write mode
-(setq +zen-text-scale 0.8)
+(setq +zen-text-scale 1)
 
 
 (defvar +zen-serif-p t
@@ -623,6 +623,12 @@ Not added when either:
 
 (add-to-list '+org-babel-mode-alist '(jags . ess-jags))
 
+(defun close-all-buffers ()
+  (interactive)
+  (mapc 'kill-buffer (buffer-list)))
+(defun only-current-buffer ()
+  (interactive)
+    (mapc 'kill-buffer (cdr (buffer-list (current-buffer)))))
 
 ;; Ispell is nice,
 ;;https://tecosaur.github.io/emacs-config/config.html#ispell
